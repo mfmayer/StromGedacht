@@ -2,13 +2,15 @@
 
 > ⚠️ **IN DEVELOPMENT AND BARELY TESTED**
 
-The Stromgedacht Sensor is a custom component for Home Assistant that integrates data from the Stromgedacht API (https://api.stromgedacht.de/v1/states). It provides three sensors:
+This [StromGedacht](https://www.stromgedacht.de) Sensor is a custom component for Home Assistant that integrates data from the [StromGedacht API](https://api.stromgedacht.de/v1/states) provided by [TransnetBW GmbH](https://www.transnetbw.de/) to help stabilizing the power grid.
+
+The sensor provides three entities:
 
 1. Current state of the power grid.
 2. The number of minutes until the state is greater than or equal to 2 (Orange). If the state remains green or yellow within the queried interval, the total minutes of the entire interval are returned. If the current state is orange or red, 0 is returned.
 3. The number of minutes until the state changes from red or orange back to green or yellow. If this does not happen within the known interval, the entire known interval is returned. If the current state is green or yellow, 0 is returned.
 
-The API is queried cyclically every 10 minutes for the next 48 hours.
+The API is queried cyclically every 10 minutes and retrieves data for the next 48 hours.
 
 ## States
 
