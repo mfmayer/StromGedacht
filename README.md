@@ -1,50 +1,54 @@
-# StromGedacht
+# StromGedacht Sensor for Home Assistant
 
-> ⚠️ **UNTESTED AND IN DEVELOPMENT**
+> ⚠️ **IN DEVELOPMENT AND BARELY TESTED**
 
-StromGedacht ist ein Home Assistant Plugin, das den Status des Stromnetzes basierend auf der "StromGedacht API" der Firma TransnetBW GmbH abfragt. Es zeigt den aktuellen Netzstatus sowie Informationen über zukünftige Netzphasen an. Weitere Informationen finden Sie auf der offiziellen Webseite: https://www.stromgedacht.de.
+The Stromgedacht Sensor is a custom component for Home Assistant that integrates data from the Stromgedacht API (https://api.stromgedacht.de/v1/states). It provides three sensors:
 
-## Status Werte
+1. Current state of the power grid.
+2. The number of minutes until the state is greater than or equal to 2 (Orange). If the state remains green or yellow within the queried interval, the total minutes of the entire interval are returned. If the current state is orange or red, 0 is returned.
+3. The number of minutes until the state changes from red or orange back to green or yellow. If this does not happen within the known interval, the entire known interval is returned. If the current state is green or yellow, 0 is returned.
 
-Die Statuswerte repräsentieren die Netzphasen:
+The API is queried cyclically every 10 minutes for the next 48 hours.
 
-- Status 1 (Grüne Phase): Normalbetrieb, keine speziellen Berücksichtigungen
-- Status 2 (Gelbe Phase): Angespannte Situation vorhergesagt; Anstehender Stromverbrauch sollte vorgezogen werden, um Verbrauch in Orange oder Rot zu vermeiden
-- Status 3 (Orange Phase): Netzengpass und möglicherweise Strommangel; Verbrauch sollte reduziert werden, um Kosten und CO2 zu sparen
-- Status 4 (Rote Phase): Größerer Netzengpass und möglicherweise unzureichende Kapazitäten; Stromverbrauch sollte soweit wie möglich reduziert werden, um die Versorgung abzusichern
+## States
+
+The Stromgedacht Sensor returns the power grid's current state, which can be one of the following four states:
+
+1. **Green State (1)**: Normal operation - No action is required. The power grid is functioning without any issues, and there is no need for you to adjust your energy consumption.
+2. **Yellow State (2)**: Reschedule consumption - It is recommended to use electricity now, as the power grid is experiencing a moderate load. By using electricity during this period, you can help alleviate the stress on the grid.
+3. **Orange State (3)**: Reduce consumption - To save costs and reduce CO2 emissions, it is advised to minimize your energy usage during this period. The power grid is experiencing a higher load, and cutting down on consumption can help maintain stability.
+4. **Red State (4)**: Reduce consumption urgently - The power grid is under significant stress, and it is crucial to decrease your electricity usage to prevent potential power shortages. This state indicates an emergency situation, where immediate action is necessary to maintain the stability of the grid.
 
 ## Installation
 
-1. Laden Sie die Dateien `__init__.py` und `power_status.py` aus diesem Repository herunter und speichern Sie sie in einem Ordner namens stromgedacht innerhalb des custom_components Ordners in Ihrem Home Assistant-Konfigurationsverzeichnis. Die Verzeichnisstruktur sollte wie folgt aussehen:
+1. Create a folder named `custom_components` in your Home Assistant config directory, if it does not already exist.
+2. Create a folder named "stromgedacht" in this `custom_components` folder.
+2. Copy the files `__init__.py`, `manifest.json` and `sensor.py` files from this repository into the `custom_components` folder:
     ```
     .config/
     └── custom_components/
         └── stromgedacht/
             ├── __init__.py
-            └── power_status.py
-
+            └── manifest.json
+            └── sensor.py
     ```
-
-2. Fügen Sie die folgende Konfiguration zu Ihrer `configuration.yaml`-Datei hinzu:
-    ```conf
+3. Add the following to your configuration.yaml file:
+    ```yaml
     sensor:
-      - platform: stromgedacht
+    - platform: stromgedacht
         zip: YOUR_ZIP_CODE
-        next_hours: OPTIONAL_NUMBER_OF_HOURS
     ```
-    Ersetzen Sie `YOUR_ZIP_CODE` durch Ihre Postleitzahl und `OPTIONAL_NUMBER_OF_HOURS` (optional) durch die Anzahl der Stunden, für die der höchste Status und die Zeit bis zur nächsten angespannten bzw. entspannten Situation berechnet werden sollen. Wenn `next_hours` nicht angegeben wird, wird der Standardwert von 2 Stunden verwendet.
+    Replace YOUR_ZIP_CODE with your actual zip code.
+4. Restart Home Assistant.
 
-3. Starten Sie Home Assistant neu.
+## Usage
 
-## Sensor-Entitäten
+After installation, you will see three new sensors in Home Assistant:
 
-Nach der Installation und Konfiguration der Integration sollten die folgenden Sensorentitäten in Home Assistant verfügbar sein:
+1. Current State
+2. Minutes Until State >= 2
+3. Minutes Until State Returnns to 1 or 2
 
-1. `sensor.current_status`: Zeigt den aktuellen Netzstatus an (1-4)
-2. `sensor.highest_status_in_next_x_hours`: Zeigt den höchsten Status in den nächsten X Stunden an, wobei X der in `next_hours` angegebene Wert ist
-3. `sensor.time_until_next_stress_situation`: Zeigt die verbleibende Zeit (in Sekunden) bis zur nächsten angespannten Situation (Orange oder Rot) an
-4. `sensor.time_until_next_relaxed_situation`: Zeigt die verbleibende Zeit (in Sekunden) bis zur nächsten entspannten Situation (Gelb oder Grün) an
+![](./assets/2023-05-09-21-41-26.png)
 
-## Unterstützung
-
-Wenn Sie Fragen oder Probleme haben, erstellen Sie bitte ein Issue in diesem Repository oder treten Sie der Home Assistant Community bei und stellen Sie Ihre Frage im entsprechenden Forum.
+These sensors can be used in automations, scripts, or displayed on the Home Assistant dashboard.

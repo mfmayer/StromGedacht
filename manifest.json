@@ -1,0 +1,12 @@
+{
+  "domain": "stromgedacht",
+  "name": "Stromgedacht Sensor",
+  "documentation": "https://github.com/mfmayer/stromgedacht",
+  "requirements": [],
+  "dependencies": [],
+  "codeowners": [
+    "@mfmayer"
+  ],
+  "version": "0.0.1",
+  "iot_class": "cloud_polling"
+}
